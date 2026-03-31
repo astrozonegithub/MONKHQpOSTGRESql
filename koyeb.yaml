@@ -3,10 +3,11 @@ services:
   - name: monkhq-web
     source_dir: .
     build_command: |
+      pip install --upgrade pip
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
-      python manage.py migrate
-    run_command: gunicorn monkhq.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120 --max-requests 1000 --max-requests-jitter 100
+      python manage.py migrate --noinput
+    run_command: gunicorn monkhq.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     environment_variables:
       - key: DJANGO_SETTINGS_MODULE
         value: monkhq.settings
@@ -35,7 +36,7 @@ services:
     routes:
       - path: /
     health_check:
-      path: /health/
+      path: /
       port: 8000
       protocol: http
       grace_period: 10
