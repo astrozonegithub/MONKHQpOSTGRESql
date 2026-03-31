@@ -30,14 +30,11 @@ COPY . .
 # Create static files directory
 RUN mkdir -p staticfiles media
 
-# Collect static files
-RUN python manage.py collectstatic --noinput --settings=monkhq.settings_production
-
-# Run migrations
-RUN python manage.py migrate --settings=monkhq.settings_production
-
 # Create health check script
 RUN echo '#!/bin/bash\ncurl -f http://localhost:8000/health/ || exit 1' > /app/healthcheck.sh && chmod +x /app/healthcheck.sh
+
+# Entrypoint uses start.sh for runtime setup
+ENTRYPOINT ["/app/start.sh"]
 
 # Expose port
 EXPOSE 8000

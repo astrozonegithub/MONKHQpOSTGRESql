@@ -1,4 +1,19 @@
 #!/bin/bash
+set -e
+
+# Load environment variables from .env if present
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
+# Collect static files
+python manage.py collectstatic --noinput --settings=monkhq.settings_production
+
+# Run migrations
+python manage.py migrate --settings=monkhq.settings_production
+
+# Start Gunicorn server
+exec gunicorn monkhq.wsgi:application --bind 0.0.0.0:8000#!/bin/bash
 
 # Create logs directory
 mkdir -p logs
